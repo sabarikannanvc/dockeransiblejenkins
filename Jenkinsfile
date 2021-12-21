@@ -17,10 +17,10 @@ pipeline {
             }
             stage('Sonarqube') {
                 environment {
-                scannerHome = tool 'SonarQubeScanner'
+                scannerHome = tool 'Sonar-qube-scanner'
                 }
                 steps {
-                    withSonarQubeEnv('sonarqube') {
+                    withSonarQubeEnv('SonarQube') {
                         sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=develop -Dsonar.sources=. "
                         }
                     // timeout(time: 10, unit: 'MINUTES') {
