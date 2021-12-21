@@ -1,45 +1,48 @@
-pipeline{
+pipeline {
     agent any
-    tools {
-      maven 'maven3'
-    }
     environment {
-      DOCKER_TAG = getVersion()
+         DOCKER_TAG = getVersion()
+        
     }
-    stages{
-        stage('SCM'){
-            steps{
-               git 'https://github.com/testdevops11/dockeransiblejenkins.git'
-            }
-        }
-        
-        stage('Maven Build'){
-            steps{
-                sh "mvn clean package"
-            }
-        }
-        
-        stage('Docker Build'){
-            steps{
-                sh " docker build . -t sahilthakre123/sampleapp:${DOCKER_TAG} "
-            }
-        }
-        stage('DockerHub Push'){
-            steps{
-                withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerHubPwd')]) {
-                    sh "docker login -u sahilthakre123 -p ${dockerHubPwd}"
+   
+    tools {
+        maven 'Maven3'
+    }
+    stages
+        {
+            stage('copy SCM'){
+                steps{
+                    git 'https://github.com/sabarikannanvc/dockeransiblejenkins.git'
                 }
-                
-                sh "docker push sahilthakre123/sampleapp:${DOCKER_TAG} "
             }
-        }
-        stage('Docker deploy using ansible'){
-            steps{
-                ansiblePlaybook become: true, credentialsId: 'dev-server', disableHostKeyChecking: true, extras: "-e DOCKER_TAG=${DOCKER_TAG}", installation: 'ansible', inventory: 'dev.inv', playbook: 'deploy-docker.yml'
+            stage('MVN Build'){
+                steps{
+                        sh 'mvn clean package'
+                }
             }
+            stage('DOCKER build'){
+                steps{
+                    sh "docker build . -t myprojects123/sampleapp:${DOCKER_TAG}"
+                }
+            }
+            stage('Docker push dockerhub'){
+                steps{
+                    withCredentials([string(credentialsId: '2f6c69a5-6ef9-400f-9484-91ef5370eeae', variable: 'MyDockerPwd')]) {
+                             sh "docker login -u myprojects123 -p ${MyDockerPwd}"
+                    }
+                    sh "docker push myprojects123/sampleapp:${DOCKER_TAG}"
+                }
+            }
+            stage('ANSIBLE slave'){
+                steps{
+                    ansiblePlaybook become: true, credentialsId: 'dev-server', disableHostKeyChecking: true, extras: "-e DOCKER_TAG=${DOCKER_TAG}", installation: 'ansible', inventory: 'dev.inv', playbook: 'deploy-docker.yml'
+                }
+            }
+           
         }
-    }
 }
+   
+
 
 def getVersion(){
     def commitHash = sh returnStdout: true, script: 'git rev-parse --short HEAD'
