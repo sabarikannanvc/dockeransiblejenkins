@@ -21,7 +21,7 @@ pipeline {
                 }
                 post {
                       always {
-                                    jiraSendDeploymentInfo site: '<sitename>.atlassian.net', environmentId: 'us-prod-1', environmentName: 'us-prod-1', environmentType: 'production'
+                                    jiraSendBuildInfo branch: '', site: 'megabytes.atlassian.net'
                              }
                 }
             }
