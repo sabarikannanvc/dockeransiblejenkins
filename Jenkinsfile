@@ -19,6 +19,11 @@ pipeline {
                 steps{
                         sh 'mvn clean package'
                 }
+                post {
+                      always {
+                                    jiraSendDeploymentInfo site: '<sitename>.atlassian.net', environmentId: 'us-prod-1', environmentName: 'us-prod-1', environmentType: 'production'
+                             }
+                }
             }
             stage('DOCKER build'){
                 steps{
