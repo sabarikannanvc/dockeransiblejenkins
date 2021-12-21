@@ -15,6 +15,19 @@ pipeline {
                     git 'https://github.com/sabarikannanvc/dockeransiblejenkins.git'
                 }
             }
+            stage('Sonarqube') {
+                environment {
+                scannerHome = tool 'SonarQubeScanner'
+                }
+                steps {
+                    withSonarQubeEnv('sonarqube') {
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=develop -Dsonar.sources=. "
+                        }
+                    #timeout(time: 10, unit: 'MINUTES') {
+                    #waitForQualityGate abortPipeline: true
+                    }
+                }
+             }
             stage('MVN Build'){
                 steps{
                         sh 'mvn clean package'
